@@ -13,10 +13,10 @@ userBadActions = ["Struggle."]
 userCurrentState = 0
 
 def promptGPT(userAction):
-    indoctronation = "You are a bot and your only role is to determine if a sentence is similar to one of two statments. If the sentence is similar to the first statement, only respond with the word 'ONE', if the sentence is similar to the second statment, only respond with the word 'TWO'. If neither of the statements are similar, respond with 'NEITHER'."
-    indoctronation += "\nThe sentence is as follows: " + userAction
-    indoctronation += "\nThe first statement is as follows: " + userGoodActions[userCurrentState]
-    indoctronation += "\nThe second statement is as follows: " + userBadActions[userCurrentState]
+    indoctronation = "You are a bot and your only role is to determine if a SENTENCE is similar to one of two STATEMENTS. If the SENTENCE is similar to STATEMENT ONE, only respond with the word 'ONE', if the SENTENCE is similar to STATEMENT TWO, only respond with the word 'TWO'. If neither of the STATEMENTS are similar with the SENTENCE, respond with 'NONE'."
+    indoctronation += "\nSENTENCE: " + userAction + "."
+    indoctronation += "\nSTATEMENT ONE: " + userGoodActions[userCurrentState]
+    indoctronation += "\nSTATEMENT TWO: " + userBadActions[userCurrentState]
     print(indoctronation)
     completion = openai.Completion.create(
         engine = model_engine,
