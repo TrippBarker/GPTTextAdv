@@ -5,27 +5,46 @@ openai.api_key_path = 'D:\KEYS\TextAdvKey.txt'
 model_engine = "text-davinci-003"
 
 userSituations = ["Hands bound behind back.", 
-                  "Standing in the Wizard's camp"]
+                  "Standing in the Wizard's camp.",
+                  "Running through forest.",
+                  "Standing before the Wizard.",
+                  "The Wizard is kneeling before you.",
+                  "Beating the Wizard"]
 
 userGoodActions = ["Find sharp object.", 
-                   "Run away."]
+                   "Run away.",
+                   "Look for exit.",
+                   "Punch the Wizard.",
+                   "Kick the Wizard."]
 
 userBadActions = ["Struggle.", 
-                  "Sit and wait."]
+                  "Sit and wait.",
+                  "Keep running.",
+                  "Cower in fear.",
+                  "Run away from the Wizard."]
 
 goodActionResponse = ["You remember that you have a knife in your back pocket! Reaching carefully, you manipulate the blade open and saw away at the rope... You're free!!",
-                      "With no real sense of direction, you spring to your feet and start running!"]
+                      "With no real sense of direction, you spring to your feet and start running!",
+                      "Squinting your eyes, you take in your surroundings... THERE!!! You see a beam of light glistening in the distance... You make your brake for it!\n''TEE-HEE-HEE'' *poof* Oh no! it's the Wizard, he has appeared right before you!!",
+                      "You pull back your right fist and *POW* let him have it right in the kisser!! ''HEY NOW!!! THAT WAS NOT VERY NICE!!!'' The Wizard doubles over in pain.",
+                      "*KA-PA_CHOW* You kick the Wizard square in the jaw, he's not gonna be eating any lone travelers for a while now!"]
 
 badActionResponse = ["You squirm about, something sharp pokes at you from your back pocket...",
-                     "You sit there... Twiddling your thumbs like a dumb-dumb"]
+                     "You sit there... Twiddling your thumbs like a dumb-dumb",
+                     "You run in circles, hopelessly lost in the forsest...",
+                     "You cower in fear, like a wittle baby boi. Sow sad :(",
+                     "You could run... But maybe this Wizard deserves to be taught more of a lesson..."]
 
 hintResponse = ["Nothing seems to be working... Maybe look for something sharp to cut the rope with...",
-                "Nothing seems to be working... Maybe... I dunno.... RUN??!!!??"]
+                "Nothing seems to be working... Maybe... I dunno.... RUN??!!!??",
+                "Nothing seems to be working... Maybe try looking for an exit.",
+                "Nothing seems to be working... Maybe fight the Wizard.",
+                "Nothing seems to be working... Maybe curb stomp that bitch."]
 
 
 class GameState:
     userCurrentState = 0
-    hintCountdown = 3
+    hintCountdown = 2
 
 gs = GameState
 def promptGPT(userAction):
@@ -48,6 +67,8 @@ def decisionMethod(gptResponse):
             gs.hintCountdown = 3
             print(goodActionResponse[gs.userCurrentState])
             gs.userCurrentState += 1
+            if (gs.userCurrentState == 4):
+                playing = False
         elif (gptResponse == "TWO"):
             print(badActionResponse[gs.userCurrentState])
         else:
@@ -67,8 +88,8 @@ while (playing):
     print("Current Situation: " + userSituations[gs.userCurrentState])
     action = input("What do you do?\n> ")
     gptResponse = promptGPT(action).upper().strip()
+    decisionMethod(gptResponse)
+    if (gs.userCurrentState == 5):
+        playing = False
 
-    if (gs.userCurrentState == 0):
-        decisionMethod(gptResponse)
-    elif(gs.userCurrentState == 1):
-        decisionMethod(gptResponse)      
+print("And with that you leave the forest, the Wizard crying on a pile of leaves like the sorry wittle bitch he is, the end <3")
