@@ -4,20 +4,35 @@ import openai
 openai.api_key_path = 'D:\KEYS\TextAdvKey.txt'
 model_engine = "text-davinci-003"
 
-userSituations = ["Hands bound behind back."]
+userSituations = ["Hands bound behind back.", 
+                  "Standing in the Wizard's camp"]
 
-userGoodActions = ["Find sharp object."]
+userGoodActions = ["Find sharp object.", 
+                   "Run away."]
 
-userBadActions = ["Struggle."]
+userBadActions = ["Struggle.", 
+                  "Sit and wait."]
 
-userCurrentState = 0
-hintCountdown = 3
+goodActionResponse = ["You remember that you have a knife in your back pocket! Reaching carefully, you manipulate the blade open and saw away at the rope... You're free!!",
+                      "With no real sense of direction, you spring to your feet and start running!"]
 
+badActionResponse = ["You squirm about, something sharp pokes at you from your back pocket...",
+                     "You sit there... Twiddling your thumbs like a dumb-dumb"]
+
+hintResponse = ["Nothing seems to be working... Maybe look for something sharp to cut the rope with...",
+                "Nothing seems to be working... Maybe... I dunno.... RUN??!!!??"]
+
+
+class GameState:
+    userCurrentState = 0
+    hintCountdown = 3
+
+gs = GameState
 def promptGPT(userAction):
     indoctronation = "You are a bot and your only role is to determine if a SENTENCE is similar to one of two STATEMENTS. If the SENTENCE is similar to STATEMENT ONE, only respond with the word 'ONE', if the SENTENCE is similar to STATEMENT TWO, only respond with the word 'TWO'. If neither of the STATEMENTS are similar with the SENTENCE, respond with 'NONE'."
     indoctronation += "\nSENTENCE: " + userAction + "."
-    indoctronation += "\nSTATEMENT ONE: " + userGoodActions[userCurrentState]
-    indoctronation += "\nSTATEMENT TWO: " + userBadActions[userCurrentState]
+    indoctronation += "\nSTATEMENT ONE: " + userGoodActions[gs.userCurrentState]
+    indoctronation += "\nSTATEMENT TWO: " + userBadActions[gs.userCurrentState]
     completion = openai.Completion.create(
         engine = model_engine,
         prompt = indoctronation,
@@ -28,26 +43,32 @@ def promptGPT(userAction):
     )
     return completion.choices[0].text
 
+def decisionMethod(gptResponse):
+        if (gptResponse == "ONE"):
+            gs.hintCountdown = 3
+            print(goodActionResponse[gs.userCurrentState])
+            gs.userCurrentState += 1
+        elif (gptResponse == "TWO"):
+            print(badActionResponse[gs.userCurrentState])
+        else:
+            if (gs.hintCountdown == 0):
+                gs.hintCountdown = 3
+                print(hintResponse[gs.userCurrentState])
+            else:
+                print("No... That doesn't seem right...")
+                gs.hintCountdown -= 1
+
+
 with open ('intro.txt', 'r') as file:
     print(file.read())
 
 playing = True
 while (playing):
-    print("Current Situation: " + userSituations[userCurrentState])
+    print("Current Situation: " + userSituations[gs.userCurrentState])
     action = input("What do you do?\n> ")
     gptResponse = promptGPT(action).upper().strip()
-    if (userCurrentState == 0):
-        if (gptResponse == "ONE"):
-            hintCountdown = 3
-            userCurrentState += 1
-            print("You remember that you have a knife in your back pocket! Reaching carefully, you manipulate the blade open and saw away at the rope... You're free!!")
-        elif (gptResponse == "TWO"):
-            print("You squirm about, something sharp pokes at you from your back pocket...")
-        else:
-            if (hintCountdown == 0):
-                hintCountdown = 3
-                print("Nothing seems to be working... Maybe look for something sharp to cut the rope with...")
-            else:
-                print("No... That doesn't seem right...")
-                hintCountdown -= 1
-            
+
+    if (gs.userCurrentState == 0):
+        decisionMethod(gptResponse)
+    elif(gs.userCurrentState == 1):
+        decisionMethod(gptResponse)      
